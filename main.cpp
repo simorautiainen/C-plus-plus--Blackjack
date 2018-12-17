@@ -1,146 +1,118 @@
 #include <iostream>
 #include <string>
 #include <time.h>
-#include<algorithm>
-#include"peli.cpp"
+#include "Header.h"
+
 using namespace std;
 
-/* tämä funktio jakaa yhden kortin haluttuihin listoihin ja paikka on
-sitä varten että pysytään mukana että monessako indexissä on kortteja*/
-void pelikortinjako(string kortit[],int arvot[], string korttinimet[],
-                      int korttiarvot[],int& paikka){
 
-                      string kortti1nimi;
-                      int korttiarvo,arvo1;
+int main() {
+	
+	
+	//********************KAIKKI MUUTTUJAT*******************
 
-                      bool tren = true;
-                      srand(time(0));
-                      while(tren){
+	//nämä ovat erillisessä filussa nimeltään pelikortit.cpp
 
-                        arvo1 = rand() % 52;
-                        if(kortit[arvo1]=="0"){
+	string pelikortit[52];
+	int arvot[52];
+	
+	//koska käytän paikka muuttujia, minun ei ole pakko nollata pelaajien taulukoita
+	//koska pysyn aina mukana, että kuinka monta korttia on kunkin taulukossa ja
+	//missäkin kohdalla
+	int vihunpaikka = 0, pelaajanpaikka = 0;
 
-                          arvo1 = rand() % 52;
-                        }
-                        else{
-                          kortti1nimi = kortit[arvo1];
-                          kortit[arvo1] = "0";
-                          korttiarvo = arvot[arvo1];
-                          tren = false;
+	const int tittels = 20;
+	string pelaajankortit[tittels];
+	int pelaajanarvot[tittels];
 
-                      }
-
-                      }
-
-                      korttinimet[paikka] = kortti1nimi;
-                      korttiarvot[paikka] = korttiarvo;
-                      paikka++;
+	string vihunkortit[tittels];
+	int vihunarvot[tittels];
 
 
-}
+	bool onoff = true;
+	int pelaajanyhteisarvo = 0;
 
-void alasconvertteri(string& stringinnimi){
+	string yesno;
+	//*******************************************************
+	//Aloitetaan sillä että laitetaan taulukot kuntoon
 
-  for(int i = 0;i<stringinnimi.length();i++){
-    stringinnimi[i] = tolower(stringinnimi[i]);
-  }
-}
+	arvojen_pisteleminen(muokkaamattomat,pelikortit,muokkaamattomatarvot,arvot);
 
+	viivojenprinttaus(80);
+	
+	cout << "Would you like to play some blackjack(Yes or No) or read the rules(rules): ";
+	
+	while (onoff) {
+		
+		cin >> yesno;
+		viivojenprinttaus(80);
+		alasconvertteri(yesno);
+		if (yesno == "yes") {
+			cout << "Lets deal the cards: " << endl;
+			//jaetaan molemmille 2 korttia
+			pelikortinjako(pelikortit, arvot, pelaajankortit, pelaajanarvot, pelaajanpaikka);
+			pelikortinjako(pelikortit, arvot, pelaajankortit, pelaajanarvot, pelaajanpaikka);
+			pelikortinjako(pelikortit, arvot, vihunkortit, vihunarvot, vihunpaikka);
+			pelikortinjako(pelikortit, arvot, vihunkortit, vihunarvot, vihunpaikka);
 
+			cout << "\nTable has a folded card and " << vihunkortit[0]
+				<< endl << endl;
+			//printataan kortit ja katsotaan että onko pelaajalla suoraan 21
+			for (int i = 0; i < pelaajanpaikka; i++) {
+				if (i == 0) {
+					cout << "You have: " << pelaajankortit[i];
+					pelaajanyhteisarvo += pelaajanarvot[i];
+				}
+				else {
+					cout << " and " << pelaajankortit[i] << endl;
+					pelaajanyhteisarvo += pelaajanarvot[i];
+				}
+			}
 
-int main(){
+			cout << "And their sum is: " << pelaajanyhteisarvo << endl;
 
-  //Hain korttien nimet pythonilla wikipedian artikkelista "standard 52-card deck"
+			if (pelaajanyhteisarvo == 21) {
+				cout << "You WON since you got 21!!!" << endl;
+			}
+			else {
+				peli(pelikortit, arvot, pelaajankortit, pelaajanarvot, pelaajanpaikka,
+					vihunkortit,vihunarvot,vihunpaikka);
+			}
+			
+			//tähän päättyy aina peli joten on nollattava paikat joidenka kortit otetaan mukaan
+			pelaajanyhteisarvo = 0;
+			pelaajanpaikka = 0;
+			vihunpaikka = 0;
+			viivojenprinttaus(80);
+			cout << "Would you like to play some blackjack(Yes or No) or read the rules(rules): ";
+		}
 
-  string pelikortit[] = {
-    "Ace of clubs", "2 of clubs", "3 of clubs", "4 of clubs",
-    "5 of clubs", "6 of clubs", "7 of clubs", "8 of clubs",
-    "9 of clubs", "10 of clubs", "Jack of clubs",
-    "Queen of clubs", "King of clubs", "Ace of diamonds",
-    "2 of diamonds", "3 of diamonds", "4 of diamonds", "5 of diamonds",
-    "6 of diamonds", "7 of diamonds", "8 of diamonds", "9 of diamonds",
-    "10 of diamonds", "Jack of diamonds", "Queen of diamonds",
-    "King of diamonds", "Ace of hearts", "2 of hearts", "3 of hearts",
-    "4 of hearts", "5 of hearts", "6 of hearts", "7 of hearts", "8 of hearts",
-    "9 of hearts", "10 of hearts", "Jack of hearts", "Queen of hearts",
-    "King of hearts", "Ace of spades", "2 of spades", "3 of spades",
-    "8 of spades", "9 of spades", "10 of spades", "Jack of spades",
-    "Queen of spades", "King of spades",
-};
+		else if (yesno == "no") {
 
+			onoff = false;
+		}
 
-  int vihunpaikka = 0, pelaajanpaikka = 0,arvot[] =
-    {11,2,3,4,5,6,7,8,9,10,10,10,10,11,2,3,4,5,6,7,8,9,10,
-    10,10,10,11,2,3,4,5,6,7,8,9,10,10,10,10,11,2,3,4,5,6,7,
-    8,9,10,10,10,10};
-  const unsigned int tittels = 20;
-  string pelaajankortit[tittels];
-  int pelaajanarvot[tittels];
+		else if (yesno == "rules") {
+			viivojenprinttaus(80);
+			cout << "Main point of blackjack is to get as close to 21 as you can.\n" <<
+				"But if you get over 21 you lose instantly, and you battle against table\n" <<
+				"You get to see table's one card at the start of the round.\n" <<
+				"Table must stay at 17 or over it and if you get tie table always wins.\n" <<
+				"Every card is valued as they should like 2 of clubs is valued as 2\n" <<
+				",but all the face cards are valued as 10 and aces are valued as 11,\n" <<
+				"unless overall value of the cards get over 21, your ace's value become 1.\n";
+			viivojenprinttaus(80);
+			cout << "Would you like to play some blackjack(Yes or No) or read the rules(rules): ";
+				
+		}
+		else {
+			cout << "Erh, thats not valid input, lets try again!" << endl;
+			cout << "Would you like to play some blackjack(Yes or No) or read the rules(rules): ";
+			continue;
+		}
 
-  string vihunkortit[tittels];
-  int vihunarvot[tittels];
-
-  bool onoff = true;
-  int pelaajanyhteisarvo = 0;
-
-  string yesno;
-  cout << "Would you like to play some blackjack,(Yes or No)";
-
-  while(onoff){
-
-    cin >> yesno;
-    alasconvertteri(yesno);
-    if(yesno=="yes"){
-      cout << "Lets deal the cards: " << endl;
-      pelikortinjako(pelikortit,arvot,pelaajankortit,pelaajanarvot,pelaajanpaikka);
-      pelikortinjako(pelikortit,arvot,pelaajankortit,pelaajanarvot,pelaajanpaikka);
-      pelikortinjako(pelikortit,arvot,vihunkortit,vihunarvot,vihunpaikka);
-      pelikortinjako(pelikortit,arvot,vihunkortit,vihunarvot,vihunpaikka);
-
-      cout << "\nAnd your enemy has a folded card and " << vihunkortit[0]
-      << endl << endl;
-
-      for(int i = 0;i<pelaajanpaikka;i++){
-        if(i==0){
-          cout << "You have: " << pelaajankortit[i];
-          pelaajanyhteisarvo += pelaajanarvot[i];
-        }
-        else{
-        cout << " and " << pelaajankortit[i] << endl;
-        pelaajanyhteisarvo += pelaajanarvot[i];
-      }
-    }
-
-      cout << "And their sum is: " << pelaajanyhteisarvo << endl;
-      if(pelaajanyhteisarvo == 21){
-        cout << "You WON since you got 21!!!" << endl;
-      }
-      else{
-        peli(pelikortit,arvot,pelaajankortit,pelaajanarvot,pelaajanpaikka,
-        vihun)
-      }
-    //TÄSTÄ ALKAA ITSE PELI!
-
-      cout << "Would you like to play again (yes or no): ";
-    }
-    else if(yesno=="no"){
-      onoff = false;
-    }
-
-    else{
-      cout << "Erh, thats not valid input, lets try again!" << endl;
-      cout << "Would you like to play some blackjack,(Yes or No): ";
-      continue;
-    }
-
-}
+	}
 
 
-  // pelikortinjakoa ajetaan niin, että annetaan sille 5 parametriä
-  // kaikki kortit, kaikki arvot, se mihin listaan halutaan kortin nimi,
-  //sitten se mihin halutaan kortin arvo ja se että mihin kohtaan
-  //halutaan ne listassa
-
-
-  return 0;
+	return 0;
 }
